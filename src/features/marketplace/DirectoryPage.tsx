@@ -2,8 +2,8 @@ import { useState, useEffect } from "react";
 import { MapContainer, TileLayer, Marker, Popup, useMap } from "react-leaflet";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
-import { 
-  Search, SlidersHorizontal, Star, MapPin, Phone, 
+import {
+  Search, SlidersHorizontal, Star, MapPin, Phone,
   BadgeCheck, X, ChevronDown, Building2, Clock
 } from "lucide-react";
 import { cn } from "@/utils/cn";
@@ -16,13 +16,12 @@ L.Icon.Default.mergeOptions({
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
 });
 
-// Custom orange marker
 const createOrangeIcon = (active = false) =>
   L.divIcon({
     html: `
       <div style="
-        width: ${active ? 44 : 36}px; 
-        height: ${active ? 44 : 36}px; 
+        width: ${active ? 44 : 36}px;
+        height: ${active ? 44 : 36}px;
         background: ${active ? "#FF6A00" : "#1e293b"};
         border: 3px solid ${active ? "#fff" : "#FF6A00"};
         border-radius: 50% 50% 50% 0;
@@ -53,7 +52,6 @@ interface IContractor {
   image: string;
 }
 
-// Mock data – replace with real API call
 const MOCK_CONTRACTORS: IContractor[] = [
   { id: 1, name: "Constructora Horizonte C.A.", specialty: "Obras Civiles y Vialidad", state: "Distrito Capital", lat: 10.4806, lng: -66.9036, rating: 4.8, reviews: 142, phone: "+58 212 555-0101", verified: true, hours: "Lun–Vie 8am–5pm", category: "obras_civiles", image: "https://picsum.photos/seed/h1/80/80" },
   { id: 2, name: "AceroCenter Mayorista", specialty: "Distribución de Acero y Metales", state: "Miranda", lat: 10.4200, lng: -66.8500, rating: 4.9, reviews: 89, phone: "+58 212 555-0202", verified: true, hours: "Lun–Sáb 7am–6pm", category: "materiales", image: "https://picsum.photos/seed/h2/80/80" },
@@ -83,7 +81,6 @@ const STATES = [
   { id: "Aragua", label: "Aragua" },
 ];
 
-// Helper to pan map to selected contractor
 function MapFlyTo({ lat, lng }: { lat: number; lng: number }) {
   const map = useMap();
   useEffect(() => {
@@ -97,7 +94,6 @@ export function DirectoryPage() {
   const [category, setCategory] = useState("");
   const [state, setState] = useState("");
   const [selected, setSelected] = useState<IContractor | null>(null);
-  const [showFilters, setShowFilters] = useState(false);
   const [verifiedOnly, setVerifiedOnly] = useState(false);
 
   const filtered = MOCK_CONTRACTORS.filter(c => {
@@ -112,46 +108,45 @@ export function DirectoryPage() {
   return (
     <div className="flex flex-col" style={{ height: "calc(100vh - 88px)" }}>
       {/* ── Top Search Bar ── */}
-      <div className="bg-card border-b border-border px-4 py-3 flex flex-col md:flex-row gap-3 items-start md:items-center shrink-0">
+      <div className="bg-white border-b border-gray-100 shadow-sm px-4 py-3 flex flex-col md:flex-row gap-3 items-start md:items-center shrink-0">
         <div className="flex-1 w-full relative">
-          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={18} />
+          <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
           <input
             value={search}
             onChange={e => setSearch(e.target.value)}
             placeholder="Buscar contratistas, empresas o especialidades..."
-            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-background border border-border text-sm text-foreground placeholder:text-muted-foreground focus:ring-2 focus:ring-primary/30 focus:border-primary outline-none transition"
+            className="w-full pl-10 pr-4 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00] outline-none transition"
           />
           {search && (
-            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground">
+            <button onClick={() => setSearch("")} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-700">
               <X size={16} />
             </button>
           )}
         </div>
 
-        {/* Filters row */}
         <div className="flex gap-2 w-full md:w-auto flex-wrap">
-          {/* Category select */}
+          {/* Category */}
           <div className="relative">
             <select
               value={category}
               onChange={e => setCategory(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-background border border-border text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/30 outline-none cursor-pointer"
+              className="appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[#FF6A00]/30 outline-none cursor-pointer"
             >
               {CATEGORIES.map(c => <option key={c.id} value={c.id}>{c.label}</option>)}
             </select>
-            <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
 
-          {/* State select */}
+          {/* State */}
           <div className="relative">
             <select
               value={state}
               onChange={e => setState(e.target.value)}
-              className="appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-background border border-border text-sm font-medium text-foreground focus:ring-2 focus:ring-primary/30 outline-none cursor-pointer"
+              className="appearance-none pl-3 pr-8 py-2.5 rounded-xl bg-gray-50 border border-gray-200 text-sm font-medium text-gray-700 focus:ring-2 focus:ring-[#FF6A00]/30 outline-none cursor-pointer"
             >
               {STATES.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
             </select>
-            <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-muted-foreground pointer-events-none" />
+            <ChevronDown size={14} className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
           </div>
 
           {/* Verified toggle */}
@@ -160,92 +155,78 @@ export function DirectoryPage() {
             className={cn(
               "flex items-center gap-1.5 px-4 py-2.5 rounded-xl border text-sm font-medium transition-all",
               verifiedOnly
-                ? "bg-primary text-primary-foreground border-primary"
-                : "bg-background border-border text-muted-foreground hover:text-foreground"
+                ? "bg-[#FF6A00] text-white border-[#FF6A00] shadow-md shadow-[#FF6A00]/20"
+                : "bg-gray-50 border-gray-200 text-gray-600 hover:text-gray-900"
             )}
           >
             <BadgeCheck size={16} /> Verificadas
           </button>
 
           <button
-            onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-border bg-background text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            onClick={() => { setSearch(""); setCategory(""); setState(""); setVerifiedOnly(false); }}
+            className="flex items-center gap-1.5 px-4 py-2.5 rounded-xl border border-gray-200 bg-gray-50 text-sm font-medium text-gray-500 hover:text-gray-900 transition"
           >
-            <SlidersHorizontal size={16} /> Filtros
+            <SlidersHorizontal size={16} /> Limpiar
           </button>
         </div>
       </div>
 
       {/* Results count */}
-      <div className="bg-background border-b border-border px-4 py-2 text-xs text-muted-foreground shrink-0">
-        <span className="font-semibold text-foreground">{filtered.length}</span> contratistas encontrados
-        {(category || state || verifiedOnly || search) && (
-          <button
-            onClick={() => { setSearch(""); setCategory(""); setState(""); setVerifiedOnly(false); }}
-            className="ml-3 text-primary hover:underline font-medium"
-          >
-            Limpiar filtros
-          </button>
-        )}
+      <div className="bg-gray-50 border-b border-gray-100 px-4 py-2 text-xs text-gray-500 shrink-0">
+        <span className="font-semibold text-gray-800">{filtered.length}</span> contratistas encontrados
       </div>
 
-      {/* ── Main Content: Cards + Map ── */}
+      {/* ── Main: Cards + Map ── */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left: Contractor Cards List */}
-        <div className="w-full md:w-[380px] lg:w-[420px] shrink-0 overflow-y-auto bg-background border-r border-border">
+        {/* Left panel */}
+        <div className="w-full md:w-[380px] lg:w-[420px] shrink-0 overflow-y-auto bg-white border-r border-gray-100">
           {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20 text-muted-foreground gap-4">
+            <div className="flex flex-col items-center justify-center h-full text-center px-8 py-20 text-gray-400 gap-4">
               <Building2 size={48} className="opacity-20" />
-              <p className="text-lg font-semibold">Sin resultados</p>
+              <p className="text-lg font-semibold text-gray-500">Sin resultados</p>
               <p className="text-sm">Intenta ajustar los filtros de búsqueda.</p>
             </div>
           ) : (
-            <div className="divide-y divide-border">
+            <div className="divide-y divide-gray-50">
               {filtered.map(contractor => (
                 <button
                   key={contractor.id}
                   onClick={() => setSelected(contractor)}
                   className={cn(
-                    "w-full text-left p-4 flex gap-4 hover:bg-muted/30 transition-colors group",
-                    selected?.id === contractor.id && "bg-primary/5 border-l-4 border-l-primary"
+                    "w-full text-left p-4 flex gap-4 hover:bg-gray-50 transition-colors group",
+                    selected?.id === contractor.id && "bg-orange-50 border-l-4 border-l-[#FF6A00]"
                   )}
                 >
                   {/* Avatar */}
-                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 border border-border">
+                  <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100 shadow-sm">
                     <img src={contractor.image} alt={contractor.name} className="w-full h-full object-cover" />
                   </div>
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
                     <div className="flex items-start justify-between gap-2">
-                      <h3 className="font-bold text-sm text-foreground leading-tight truncate pr-1">
+                      <h3 className="font-bold text-sm text-gray-900 leading-tight truncate pr-1">
                         {contractor.name}
                       </h3>
                       {contractor.verified && (
                         <BadgeCheck size={16} className="text-blue-500 shrink-0 mt-0.5" />
                       )}
                     </div>
-                    <p className="text-xs text-muted-foreground mt-0.5 truncate">{contractor.specialty}</p>
+                    <p className="text-xs text-[#FF6A00] font-medium mt-0.5 truncate">{contractor.specialty}</p>
 
-                    {/* Rating */}
                     <div className="flex items-center gap-1 mt-2">
                       {[1,2,3,4,5].map(i => (
-                        <Star
-                          key={i}
-                          size={12}
-                          className={i <= Math.round(contractor.rating) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"}
-                        />
+                        <Star key={i} size={12} className={i <= Math.round(contractor.rating) ? "text-amber-400 fill-amber-400" : "text-gray-200"} />
                       ))}
-                      <span className="text-xs font-semibold text-foreground ml-0.5">{contractor.rating}</span>
-                      <span className="text-xs text-muted-foreground">({contractor.reviews})</span>
+                      <span className="text-xs font-semibold text-gray-800 ml-0.5">{contractor.rating}</span>
+                      <span className="text-xs text-gray-400">({contractor.reviews})</span>
                     </div>
 
-                    {/* Location & hours */}
-                    <div className="flex items-center gap-3 mt-2 flex-wrap">
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                    <div className="flex items-center gap-3 mt-1.5 flex-wrap">
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
                         <MapPin size={11} /> {contractor.state}
                       </span>
-                      <span className="flex items-center gap-1 text-xs text-muted-foreground">
+                      <span className="flex items-center gap-1 text-xs text-gray-500">
                         <Clock size={11} /> {contractor.hours}
                       </span>
                     </div>
@@ -268,9 +249,7 @@ export function DirectoryPage() {
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
             />
-
             {selected && <MapFlyTo lat={selected.lat} lng={selected.lng} />}
-
             {filtered.map(contractor => (
               <Marker
                 key={contractor.id}
@@ -278,7 +257,7 @@ export function DirectoryPage() {
                 icon={createOrangeIcon(selected?.id === contractor.id)}
                 eventHandlers={{ click: () => setSelected(contractor) }}
               >
-                <Popup className="leaflet-popup-custom">
+                <Popup>
                   <div className="p-1 min-w-[180px]">
                     <p className="font-bold text-sm text-gray-900 leading-tight">{contractor.name}</p>
                     <p className="text-xs text-gray-500 mt-0.5">{contractor.specialty}</p>
@@ -298,36 +277,36 @@ export function DirectoryPage() {
 
           {/* Selected contractor floating panel */}
           {selected && (
-            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-md animate-in slide-in-from-bottom-4 duration-300">
-              <div className="bg-card border border-border rounded-2xl shadow-2xl p-5 flex gap-4 items-start">
-                <div className="w-16 h-16 rounded-xl overflow-hidden bg-muted shrink-0 border border-border">
+            <div className="absolute bottom-6 left-1/2 -translate-x-1/2 z-[1000] w-[90%] max-w-md">
+              <div className="bg-white border border-gray-100 rounded-2xl shadow-2xl p-5 flex gap-4 items-start">
+                <div className="w-16 h-16 rounded-xl overflow-hidden bg-gray-100 shrink-0 border border-gray-100">
                   <img src={selected.image} alt={selected.name} className="w-full h-full object-cover" />
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2">
-                    <h3 className="font-bold text-foreground text-sm truncate">{selected.name}</h3>
+                    <h3 className="font-bold text-gray-900 text-sm truncate">{selected.name}</h3>
                     {selected.verified && <BadgeCheck size={15} className="text-blue-500 shrink-0" />}
                   </div>
-                  <p className="text-xs text-muted-foreground mt-0.5">{selected.specialty}</p>
+                  <p className="text-xs text-[#FF6A00] font-medium mt-0.5">{selected.specialty}</p>
                   <div className="flex items-center gap-1 mt-1.5">
                     {[1,2,3,4,5].map(i => (
-                      <Star key={i} size={11} className={i <= Math.round(selected.rating) ? "text-amber-400 fill-amber-400" : "text-muted-foreground/30"} />
+                      <Star key={i} size={11} className={i <= Math.round(selected.rating) ? "text-amber-400 fill-amber-400" : "text-gray-200"} />
                     ))}
-                    <span className="text-xs font-semibold text-foreground ml-1">{selected.rating}</span>
+                    <span className="text-xs font-semibold text-gray-800 ml-1">{selected.rating}</span>
                   </div>
-                  <div className="flex gap-3 mt-3">
+                  <div className="flex gap-2 mt-3">
                     <a
                       href={`tel:${selected.phone}`}
-                      className="flex-1 py-2 bg-primary text-primary-foreground text-xs font-bold rounded-lg text-center flex items-center justify-center gap-1 hover:bg-primary/90 transition"
+                      className="flex-1 py-2 bg-[#FF6A00] text-white text-xs font-bold rounded-xl text-center flex items-center justify-center gap-1 hover:bg-[#e65f00] transition shadow-md shadow-[#FF6A00]/20"
                     >
                       <Phone size={13} /> Llamar
                     </a>
-                    <button className="flex-1 py-2 bg-muted text-foreground text-xs font-bold rounded-lg hover:bg-muted/70 transition">
+                    <button className="flex-1 py-2 bg-gray-100 text-gray-800 text-xs font-bold rounded-xl hover:bg-gray-200 transition">
                       Ver Perfil
                     </button>
                     <button
                       onClick={() => setSelected(null)}
-                      className="w-9 h-9 flex items-center justify-center rounded-lg bg-muted hover:bg-muted/70 transition text-muted-foreground"
+                      className="w-9 h-9 flex items-center justify-center rounded-xl bg-gray-100 hover:bg-gray-200 transition text-gray-500"
                     >
                       <X size={16} />
                     </button>
@@ -336,22 +315,6 @@ export function DirectoryPage() {
               </div>
             </div>
           )}
-
-          {/* Zoom controls */}
-          <div className="absolute top-4 right-4 z-[1000] flex flex-col gap-1">
-            <button
-              onClick={() => {
-                const map = document.querySelector(".leaflet-container") as any;
-                if (map?._leaflet_id) return;
-              }}
-              className="w-10 h-10 bg-card border border-border rounded-xl shadow flex items-center justify-center text-foreground hover:bg-muted transition font-bold text-lg"
-            >
-              +
-            </button>
-            <button className="w-10 h-10 bg-card border border-border rounded-xl shadow flex items-center justify-center text-foreground hover:bg-muted transition font-bold text-lg">
-              −
-            </button>
-          </div>
         </div>
       </div>
     </div>

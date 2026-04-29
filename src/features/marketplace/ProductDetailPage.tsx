@@ -2,9 +2,30 @@ import { useState } from "react";
 import { useParams, Link, useNavigate } from "react-router";
 import { 
   Star, ShoppingBag, ArrowLeft, Heart, Share2, 
-  ShieldCheck, Truck, RotateCcw, Building2, MapPin, CheckCircle2
+  ShieldCheck, Truck, RotateCcw, Building2, MapPin, CheckCircle2,
+  ThumbsUp, MessageSquare, Send
 } from "lucide-react";
 import { cn } from "@/utils/cn";
+
+interface IReview {
+  id: number;
+  author: string;
+  avatar: string;
+  rating: number;
+  date: string;
+  comment: string;
+  helpful: number;
+  productId: number;
+}
+
+const MOCK_REVIEWS: IReview[] = [
+  { id: 1, productId: 1, author: "Carlos Medina", avatar: "https://picsum.photos/seed/u1/80/80", rating: 5, date: "2026-04-15", comment: "Excelente calidad, el cemento llegó en perfectas condiciones y el rendimiento es superior al esperado. Definitivamente volvería a comprar.", helpful: 12 },
+  { id: 2, productId: 1, author: "María González", avatar: "https://picsum.photos/seed/u2/80/80", rating: 4, date: "2026-04-10", comment: "Buen producto, cumple con lo prometido. El despacho fue rápido. Solo le bajo una estrella porque el saco llegó un poco húmedo.", helpful: 5 },
+  { id: 3, productId: 1, author: "José Ramírez", avatar: "https://picsum.photos/seed/u3/80/80", rating: 5, date: "2026-03-28", comment: "Uso este cemento en todos mis proyectos. Nunca falla. El proveedor responde rápido y el producto llega a tiempo.", helpful: 8 },
+  { id: 4, productId: 2, author: "Ana Flores", avatar: "https://picsum.photos/seed/u4/80/80", rating: 5, date: "2026-04-20", comment: "La retroexcavadora llegó en perfecto estado y el operador fue muy profesional. Terminamos el trabajo en menos tiempo de lo estimado.", helpful: 7 },
+  { id: 5, productId: 3, author: "Luis Torres", avatar: "https://picsum.photos/seed/u5/80/80", rating: 5, date: "2026-04-18", comment: "Servicio de topografía excelente. Los planos quedaron perfectos y el tiempo de entrega fue el prometido.", helpful: 3 },
+  { id: 6, productId: 4, author: "Roberto Pérez", avatar: "https://picsum.photos/seed/u6/80/80", rating: 4, date: "2026-04-05", comment: "Las cabillas son de buena calidad y el peso es el correcto. Buen proveedor.", helpful: 6 },
+];
 
 // We use the same mock data for consistency
 const MOCK_PRODUCTS = [
@@ -20,6 +41,27 @@ export function ProductDetailPage() {
   const product = MOCK_PRODUCTS.find(p => p.id === Number(id)) || MOCK_PRODUCTS[0]; // fallback
   const [activeImage, setActiveImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
+  const [newRating, setNewRating] = useState(0);
+  const [hoverRating, setHoverRating] = useState(0);
+  const [newComment, setNewComment] = useState("");
+  const [reviews, setReviews] = useState<IReview[]>(MOCK_REVIEWS);
+  const [helpfulClicked, setHelpfulClicked] = useState<Set<number>>(new Set());
+
+  const productReviews = reviews.filter(r => r.productId === product.id);
+  const avgRating = productReviews.length ? (productReviews.reduce((s, r) => s + r.rating, 0) / productReviews.length).toFixed(1) : product.rating.toFixed(1);
+  const ratingCounts = [5,4,3,2,1].map(s => ({ star: s, count: productReviews.filter(r => r.rating === s).length }));
+
+  const handleSubmitReview = () => {
+    if (!newRating || !newComment.trim()) return;
+    const review: IReview = {
+      id: Date.now(), productId: product.id,
+      author: "Tú", avatar: "https://picsum.photos/seed/me/80/80",
+      rating: newRating, date: new Date().toISOString().split('T')[0],
+      comment: newComment.trim(), helpful: 0
+    };
+    setReviews(prev => [review, ...prev]);
+    setNewRating(0); setNewComment("");
+  };
 
   return (
     <div className="min-h-screen bg-gray-50 pb-20">
@@ -222,7 +264,95 @@ export function ProductDetailPage() {
             </ul>
           </div>
         </div>
+
+        {/* ── Reviews Section ── */}
+        <div className="mt-8 bg-white rounded-2xl shadow-sm border border-gray-100 p-6 md:p-10">
+          <h2 className="text-2xl font-extrabold text-gray-900 mb-8 flex items-center gap-2">
+            <MessageSquare size={24} className="text-[#FF6A00]" />
+            Calificaciones y Reseñas
+          </h2>
+
+          {/* Rating Summary */}
+          <div className="flex flex-col md:flex-row gap-8 pb-8 mb-8 border-b border-gray-100">
+            <div className="flex flex-col items-center justify-center bg-gray-50 rounded-2xl p-8 min-w-[160px]">
+              <span className="text-6xl font-black text-[#FF6A00]">{avgRating}</span>
+              <div className="flex gap-0.5 my-2">
+                {[1,2,3,4,5].map(i => <Star key={i} size={18} className={i <= Math.round(Number(avgRating)) ? "text-amber-400 fill-amber-400" : "text-gray-200"} />)}
+              </div>
+              <span className="text-xs text-gray-500">{productReviews.length} reseñas</span>
+            </div>
+            <div className="flex-1 space-y-2">
+              {ratingCounts.map(({ star, count }) => (
+                <div key={star} className="flex items-center gap-3 text-sm">
+                  <span className="w-4 text-right font-semibold text-gray-700">{star}</span>
+                  <Star size={13} className="text-amber-400 fill-amber-400 shrink-0" />
+                  <div className="flex-1 bg-gray-100 rounded-full h-2.5 overflow-hidden">
+                    <div className="bg-amber-400 h-full rounded-full transition-all" style={{ width: productReviews.length ? `${(count / productReviews.length) * 100}%` : '0%' }} />
+                  </div>
+                  <span className="text-gray-400 w-4 text-left">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Review List */}
+          <div className="space-y-6 mb-10">
+            {productReviews.length === 0 ? (
+              <p className="text-gray-400 text-sm text-center py-8">Aún no hay reseñas. ¡Sé el primero!</p>
+            ) : productReviews.map(review => (
+              <div key={review.id} className="flex gap-4 pb-6 border-b border-gray-50 last:border-0">
+                <img src={review.avatar} alt={review.author} className="w-10 h-10 rounded-full object-cover shrink-0" />
+                <div className="flex-1">
+                  <div className="flex items-center justify-between flex-wrap gap-2">
+                    <p className="font-bold text-gray-900 text-sm">{review.author}</p>
+                    <span className="text-xs text-gray-400">{new Date(review.date).toLocaleDateString('es-VE', { year:'numeric', month:'long', day:'numeric' })}</span>
+                  </div>
+                  <div className="flex gap-0.5 my-1">
+                    {[1,2,3,4,5].map(i => <Star key={i} size={13} className={i <= review.rating ? "text-amber-400 fill-amber-400" : "text-gray-200"} />)}
+                  </div>
+                  <p className="text-gray-600 text-sm leading-relaxed">{review.comment}</p>
+                  <button
+                    onClick={() => { if (!helpfulClicked.has(review.id)) { setHelpfulClicked(prev => new Set([...prev, review.id])); } }}
+                    className={cn("mt-3 flex items-center gap-1.5 text-xs font-medium transition-colors", helpfulClicked.has(review.id) ? "text-[#FF6A00]" : "text-gray-400 hover:text-gray-700")}
+                  >
+                    <ThumbsUp size={13} /> Útil ({review.helpful + (helpfulClicked.has(review.id) ? 1 : 0)})
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* Submit Review Form */}
+          <div className="bg-gray-50 rounded-2xl p-6 border border-gray-100">
+            <h3 className="font-bold text-gray-900 mb-4">Escribe tu reseña</h3>
+            <div className="mb-4">
+              <p className="text-xs text-gray-500 mb-2 font-medium">Tu calificación</p>
+              <div className="flex gap-1">
+                {[1,2,3,4,5].map(i => (
+                  <button key={i} onMouseEnter={() => setHoverRating(i)} onMouseLeave={() => setHoverRating(0)} onClick={() => setNewRating(i)}>
+                    <Star size={28} className={cn("transition-colors", i <= (hoverRating || newRating) ? "text-amber-400 fill-amber-400" : "text-gray-300")} />
+                  </button>
+                ))}
+              </div>
+            </div>
+            <textarea
+              value={newComment}
+              onChange={e => setNewComment(e.target.value)}
+              placeholder="Comparte tu experiencia con este producto o servicio..."
+              rows={4}
+              className="w-full px-4 py-3 rounded-xl bg-white border border-gray-200 text-sm text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-[#FF6A00]/30 focus:border-[#FF6A00] outline-none resize-none mb-4"
+            />
+            <button
+              onClick={handleSubmitReview}
+              disabled={!newRating || !newComment.trim()}
+              className="flex items-center gap-2 px-6 py-3 bg-[#FF6A00] text-white font-bold rounded-xl hover:bg-[#e65f00] transition-colors disabled:opacity-40 disabled:cursor-not-allowed shadow-md shadow-[#FF6A00]/20"
+            >
+              <Send size={16} /> Publicar Reseña
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
 }
+

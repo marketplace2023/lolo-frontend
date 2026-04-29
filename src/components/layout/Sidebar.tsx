@@ -2,7 +2,7 @@ import { NavLink } from "react-router";
 import { cn } from "@/utils/cn";
 import {
   LayoutDashboard, FolderOpen, Package, Wrench, Users2,
-  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag
+  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag, MessageSquare
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -37,6 +37,7 @@ const navItems: INavItem[] = [
       { label: "Directorio de Empresas", href: "/marketplace/directory" },
       { label: "Publicar Producto/Servicio", href: "/marketplace/create" },
       { label: "Solicitudes RFQ", href: "/marketplace/rfq" },
+      { label: "Mis Reseñas", href: "/marketplace/reviews" },
     ],
   },
 ];

@@ -27,6 +27,7 @@ import { SubmaestrosPage } from "@/features/master-data/SubmaestrosPage";
 
 import { RfqPage } from "@/features/marketplace/RfqPage";
 import { ProductFormPage } from "@/features/marketplace/ProductFormPage";
+import { ReviewsDashboardPage } from "@/features/dashboard/ReviewsDashboardPage";
 import { StorefrontPage } from "@/features/marketplace/StorefrontPage";
 import { DirectoryPage } from "@/features/marketplace/DirectoryPage";
 import { ShopPage } from "@/features/marketplace/ShopPage";
@@ -84,6 +85,7 @@ export default function App() {
         <Route path="master-data/submaestros" element={<SubmaestrosPage />} />
         <Route path="marketplace/create" element={<ProductFormPage />} />
         <Route path="marketplace/rfq" element={<RfqPage />} />
+        <Route path="marketplace/reviews" element={<ReviewsDashboardPage />} />
       </Route>
     </Routes>
   );
