@@ -6,13 +6,14 @@ import { Button } from "@/components/ui/FormPrimitives";
 import { FileText, Printer, Download, FileSpreadsheet, Loader2 } from "lucide-react";
 import { ReportPresupuesto } from "./components/ReportPresupuesto";
 import { ReportAPU } from "./components/ReportAPU";
+import { ReportInsumos } from "./components/ReportInsumos";
 import { exportToExcel } from "@/utils/excel";
 
 export function ReportsPage() {
   const { project } = useOutletContext<{ project: any }>();
   const id = project?.id;
   
-  const [activeReport, setActiveReport] = useState<"presupuesto" | "apu" | null>(null);
+  const [activeReport, setActiveReport] = useState<"presupuesto" | "apu" | "materiales" | "equipos" | "manoDeObra" | null>(null);
 
   // We use the APU report endpoint because it contains all the budget info + all APUs.
   const { data: reportData, isLoading } = useQuery({
@@ -99,6 +100,10 @@ export function ReportsPage() {
 
       exportToExcel(`APU_${project.codigo}`, exportData);
     }
+    else if (["materiales", "equipos", "manoDeObra"].includes(activeReport)) {
+      // Implement Excel export for insumos if needed
+      alert("Exportación a Excel para este reporte estará disponible pronto.");
+    }
   };
 
   if (!activeReport) {
@@ -130,6 +135,45 @@ export function ReportsPage() {
             <div className="text-center">
               <h3 className="font-semibold text-foreground">Libro de APU</h3>
               <p className="text-xs text-muted-foreground mt-1">Imprimir los análisis de precios unitarios de todas las partidas.</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setActiveReport("materiales")}
+            className="flex flex-col items-center justify-center gap-3 p-8 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-accent/30 transition-colors"
+          >
+            <div className="p-4 bg-amber-500/10 text-amber-500 rounded-full">
+              <FileSpreadsheet size={32} />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-foreground">Resumen de Materiales</h3>
+              <p className="text-xs text-muted-foreground mt-1">Total de materiales requeridos para la obra.</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setActiveReport("equipos")}
+            className="flex flex-col items-center justify-center gap-3 p-8 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-accent/30 transition-colors"
+          >
+            <div className="p-4 bg-blue-500/10 text-blue-500 rounded-full">
+              <FileSpreadsheet size={32} />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-foreground">Resumen de Equipos</h3>
+              <p className="text-xs text-muted-foreground mt-1">Total de equipos requeridos para la obra.</p>
+            </div>
+          </button>
+
+          <button 
+            onClick={() => setActiveReport("manoDeObra")}
+            className="flex flex-col items-center justify-center gap-3 p-8 bg-card border border-border rounded-xl hover:border-primary/50 hover:bg-accent/30 transition-colors"
+          >
+            <div className="p-4 bg-emerald-500/10 text-emerald-500 rounded-full">
+              <FileSpreadsheet size={32} />
+            </div>
+            <div className="text-center">
+              <h3 className="font-semibold text-foreground">Resumen de Mano de Obra</h3>
+              <p className="text-xs text-muted-foreground mt-1">Total de mano de obra requerida.</p>
             </div>
           </button>
         </div>
@@ -166,6 +210,9 @@ export function ReportsPage() {
           <div className="w-full max-w-[21cm] shadow-xl border border-border bg-white" style={{ minHeight: '29.7cm' }}>
             {activeReport === "presupuesto" && <ReportPresupuesto reportData={reportData} />}
             {activeReport === "apu" && <ReportAPU reportData={reportData} />}
+            {activeReport === "materiales" && <ReportInsumos reportData={reportData} type="material" />}
+            {activeReport === "equipos" && <ReportInsumos reportData={reportData} type="equipo" />}
+            {activeReport === "manoDeObra" && <ReportInsumos reportData={reportData} type="manoDeObra" />}
           </div>
         )}
       </div>
@@ -174,6 +221,9 @@ export function ReportsPage() {
       <div className="hidden print:block w-full">
         {!isLoading && activeReport === "presupuesto" && <ReportPresupuesto reportData={reportData} />}
         {!isLoading && activeReport === "apu" && <ReportAPU reportData={reportData} />}
+        {!isLoading && activeReport === "materiales" && <ReportInsumos reportData={reportData} type="material" />}
+        {!isLoading && activeReport === "equipos" && <ReportInsumos reportData={reportData} type="equipo" />}
+        {!isLoading && activeReport === "manoDeObra" && <ReportInsumos reportData={reportData} type="manoDeObra" />}
       </div>
     </div>
   );

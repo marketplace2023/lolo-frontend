@@ -189,37 +189,58 @@ export function ValuationsPage() {
                 <th className="px-4 py-2 text-left">Nº</th>
                 <th className="px-4 py-2 text-left">Código</th>
                 <th className="px-4 py-2 text-right">Cant. Orig.</th>
-                <th className="px-4 py-2 text-right">Cant. Acum.</th>
+                <th className="px-4 py-2 text-right">Acum. Ant.</th>
                 <th className="px-4 py-2 text-right">P.U.</th>
                 <th className="px-4 py-2 text-right">Esta Valuación</th>
+                <th className="px-4 py-2 text-right">Acum. Total</th>
+                <th className="px-4 py-2 text-right">Pendiente</th>
                 <th className="px-4 py-2 text-right">Monto</th>
               </tr>
             </thead>
             <tbody>
               {details.map((d: any) => {
-                const q = edits[d.id] ?? d.cantidadValuada;
-                const pu = Number(d.precioUnitario);
-                const sub = Number(q) * pu;
+                  const q = edits[d.id] ?? d.cantidadValuada;
+                  const pu = Number(d.precioUnitario);
+                  const sub = Number(q) * pu;
+                  const orig = Number(d.cantidadOriginal ?? 0);
+                  const prevAcum = Number(d.cantidadAcumulada ?? 0);
+                  const newAcum = prevAcum - Number(d.cantidadValuada ?? 0) + Number(q);
+                  const pendiente = orig - newAcum;
+                  const isOverrun = newAcum > orig + 0.0001;
+                  const isComplete = Math.abs(pendiente) < 0.0001;
 
-                return (
-                  <tr key={d.id} className="border-b border-border/50 hover:bg-accent/20">
-                    <td className="px-4 py-2 text-muted-foreground">{d.numeroPar}</td>
-                    <td className="px-4 py-2 font-mono text-primary">{d.codigoPartida}</td>
-                    <td className="px-4 py-2 text-right font-mono text-muted-foreground">{Number(d.cantidadOriginal).toLocaleString("es-VE")}</td>
-                    <td className="px-4 py-2 text-right font-mono text-muted-foreground">{Number(d.cantidadAcumulada).toLocaleString("es-VE")}</td>
-                    <td className="px-4 py-2 text-right font-mono">{formatCurrency(pu, "")}</td>
-                    <td className="px-4 py-2 text-right">
-                      <input 
-                        type="number"
-                        className="w-24 px-2 py-1 text-right font-mono bg-input border border-border rounded focus:ring-1 focus:ring-primary"
-                        value={q}
-                        onChange={e => setEdits({ ...edits, [d.id]: e.target.value })}
-                        step="any"
-                      />
-                    </td>
-                    <td className="px-4 py-2 text-right font-mono font-medium">{formatCurrency(sub, "")}</td>
-                  </tr>
-                );
+                  return (
+                    <tr key={d.id} className="border-b border-border/50 hover:bg-accent/20">
+                      <td className="px-4 py-2 text-muted-foreground">{d.numeroPar}</td>
+                      <td className="px-4 py-2 font-mono text-primary">{d.codigoPartida}</td>
+                      <td className="px-4 py-2 text-right font-mono text-muted-foreground">{Number(d.cantidadOriginal).toLocaleString("es-VE")}</td>
+                      <td className="px-4 py-2 text-right font-mono text-muted-foreground">{prevAcum.toLocaleString("es-VE")}</td>
+                      <td className="px-4 py-2 text-right font-mono">{formatCurrency(pu, "")}</td>
+                      <td className="px-4 py-2 text-right">
+                        <input
+                          type="number"
+                          className="w-24 px-2 py-1 text-right font-mono bg-input border border-border rounded focus:ring-1 focus:ring-primary"
+                          value={q}
+                          onChange={e => setEdits({ ...edits, [d.id]: e.target.value })}
+                          step="any"
+                        />
+                      </td>
+                      <td className={`px-4 py-2 text-right font-mono text-xs ${
+                        isComplete ? 'text-emerald-500 font-semibold' :
+                        isOverrun  ? 'text-red-500 font-semibold' :
+                        'text-muted-foreground'
+                      }`}>
+                        {isComplete ? '✓ Completa' :
+                         isOverrun  ? `▲ +${Math.abs(pendiente).toLocaleString('es-VE', { maximumFractionDigits: 4 })}` :
+                         pendiente.toLocaleString('es-VE', { maximumFractionDigits: 4 })
+                        }
+                      </td>
+                      <td className="px-4 py-2 text-right font-mono text-xs text-muted-foreground">
+                        {newAcum.toLocaleString('es-VE', { maximumFractionDigits: 4 })}
+                      </td>
+                      <td className="px-4 py-2 text-right font-mono font-medium">{formatCurrency(sub, "")}</td>
+                    </tr>
+                  );
               })}
             </tbody>
           </table>

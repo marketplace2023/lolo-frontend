@@ -26,8 +26,12 @@ export function LoginPage() {
       const { data } = await api.post("/auth/login", { email, password });
       setAuth(data.token, data.user);
       navigate("/dashboard");
-    } catch {
-      setError("Credenciales inválidas. Verifique su email y contraseña.");
+    } catch (err: any) {
+      if (err.message === "Network Error" || err.code === "ERR_NETWORK") {
+        setError("Error de red: No se pudo conectar con el servidor.");
+      } else {
+        setError("Credenciales inválidas. Verifique su email y contraseña.");
+      }
     } finally {
       setLoading(false);
     }

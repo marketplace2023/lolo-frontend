@@ -2,9 +2,12 @@ import { NavLink } from "react-router";
 import { cn } from "@/utils/cn";
 import {
   LayoutDashboard, FolderOpen, Package, Wrench, Users2,
-  Layers, Building2, ChevronDown, HardHat,
+  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag
 } from "lucide-react";
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { api } from "@/services/api";
+import { useAuthStore } from "@/store/useAuthStore";
 
 interface INavItem {
   label: string;
@@ -24,6 +27,15 @@ const navItems: INavItem[] = [
       { label: "Mano de Obra", href: "/master-data/labor" },
       { label: "Partidas (APU)", href: "/master-data/items" },
       { label: "Familias BCV", href: "/master-data/bcv-families" },
+      { label: "Submaestros", href: "/master-data/submaestros" },
+    ],
+  },
+  { label: "Configuración", href: "/settings", icon: <Settings size={16} /> },
+  {
+    label: "Marketplace", icon: <ShoppingBag size={16} />,
+    children: [
+      { label: "Directorio", href: "/marketplace" },
+      { label: "Solicitudes RFQ", href: "/marketplace/rfq" },
     ],
   },
 ];
@@ -78,6 +90,14 @@ function NavGroup({ item }: { item: INavItem }) {
 }
 
 export function Sidebar() {
+  const user = useAuthStore(s => s.user);
+  
+  const { data: company } = useQuery({
+    queryKey: ["company", user?.companyId],
+    queryFn: () => api.get(`/companies/${user?.companyId}`).then(r => r.data),
+    enabled: !!user?.companyId,
+  });
+
   return (
     <aside className="w-56 flex flex-col bg-sidebar border-r border-border shrink-0">
       {/* Logo */}
@@ -101,8 +121,8 @@ export function Sidebar() {
       {/* Company indicator */}
       <div className="px-3 py-3 border-t border-border">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
-          <Building2 size={12} />
-          <span className="truncate">Sin empresa activa</span>
+          <Building2 size={12} className="shrink-0" />
+          <span className="truncate font-medium">{company?.nombre || "Sin empresa activa"}</span>
         </div>
       </div>
     </aside>

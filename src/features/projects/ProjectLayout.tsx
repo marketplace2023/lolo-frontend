@@ -1,7 +1,7 @@
-import { Outlet, useParams, Link, useLocation } from "react-router";
+import { Outlet, useParams, Link, useLocation, Navigate } from "react-router";
 import { useQuery } from "@tanstack/react-query";
 import { api } from "@/services/api";
-import { ChevronRight, FileText, TrendingUp, TrendingDown, ClipboardCheck, Calculator, FileOutput } from "lucide-react";
+import { ChevronRight, FileText, TrendingUp, TrendingDown, ClipboardCheck, Calculator, FileOutput, Layers, BookCheck, LayoutDashboard, CalendarRange } from "lucide-react";
 
 export function ProjectLayout() {
   const { id } = useParams<{ id: string }>();
@@ -14,13 +14,22 @@ export function ProjectLayout() {
   });
 
   const tabs = [
+    { name: "Resumen", path: `/projects/${id}/dashboard`, icon: <LayoutDashboard size={16} /> },
     { name: "Presupuesto", path: `/projects/${id}/budget`, icon: <FileText size={16} /> },
     { name: "Cómputos", path: `/projects/${id}/measurements`, icon: <Calculator size={16} /> },
     { name: "Valuaciones", path: `/projects/${id}/valuations`, icon: <ClipboardCheck size={16} /> },
     { name: "Aumentos", path: `/projects/${id}/aumentos`, icon: <TrendingUp size={16} /> },
     { name: "Disminuciones", path: `/projects/${id}/disminuciones`, icon: <TrendingDown size={16} /> },
+    { name: "Obras Extra", path: `/projects/${id}/extras`, icon: <Layers size={16} /> },
+    { name: "Cronograma", path: `/projects/${id}/cronograma`, icon: <CalendarRange size={16} /> },
+    { name: "Cierre", path: `/projects/${id}/cierre`, icon: <BookCheck size={16} /> },
     { name: "Reportes", path: `/projects/${id}/reports`, icon: <FileOutput size={16} /> },
   ];
+
+  // Si está en la ruta raíz del proyecto, redirigir al dashboard
+  if (location.pathname === `/projects/${id}`) {
+    return <Navigate to={`/projects/${id}/dashboard`} replace />;
+  }
 
   return (
     <div className="space-y-6">
