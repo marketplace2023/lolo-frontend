@@ -34,7 +34,8 @@ const navItems: INavItem[] = [
   {
     label: "Marketplace", icon: <ShoppingBag size={16} />,
     children: [
-      { label: "Directorio", href: "/marketplace" },
+      { label: "Directorio de Empresas", href: "/marketplace/directory" },
+      { label: "Publicar Producto/Servicio", href: "/marketplace/create" },
       { label: "Solicitudes RFQ", href: "/marketplace/rfq" },
     ],
   },

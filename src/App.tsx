@@ -2,6 +2,7 @@ import { Routes, Route, Navigate } from "react-router";
 import { useAuthStore } from "@/store/useAuthStore";
 import { MainLayout } from "@/components/layout/MainLayout";
 import { LoginPage } from "@/features/auth/LoginPage";
+import { RegisterPage } from "@/features/auth/RegisterPage";
 import { SetupPage } from "@/features/auth/SetupPage";
 import { DashboardPage } from "@/features/dashboard/DashboardPage";
 import { SettingsPage } from "@/features/dashboard/SettingsPage";
@@ -23,9 +24,14 @@ import { ItemsPage } from "@/features/master-data/ItemsPage";
 import { ApuEditorPage } from "@/features/master-data/ApuEditorPage";
 import { FamiliesPage } from "@/features/master-data/FamiliesPage";
 import { SubmaestrosPage } from "@/features/master-data/SubmaestrosPage";
-import { MarketplacePage } from "@/features/marketplace/MarketplacePage";
+
 import { RfqPage } from "@/features/marketplace/RfqPage";
 import { ProductFormPage } from "@/features/marketplace/ProductFormPage";
+import { StorefrontPage } from "@/features/marketplace/StorefrontPage";
+import { DirectoryPage } from "@/features/marketplace/DirectoryPage";
+import { ShopPage } from "@/features/marketplace/ShopPage";
+import { ProductDetailPage } from "@/features/marketplace/ProductDetailPage";
+import { PublicLayout } from "@/features/marketplace/PublicLayout";
 
 function PrivateRoute({ children }: { children: React.ReactNode }) {
   const token = useAuthStore((s) => s.token);
@@ -35,7 +41,14 @@ function PrivateRoute({ children }: { children: React.ReactNode }) {
 export default function App() {
   return (
     <Routes>
+      <Route element={<PublicLayout />}>
+        <Route path="/store" element={<StorefrontPage />} />
+        <Route path="/shop" element={<ShopPage />} />
+        <Route path="/product/:id" element={<ProductDetailPage />} />
+        <Route path="/directory" element={<DirectoryPage />} />
+      </Route>
       <Route path="/login" element={<LoginPage />} />
+      <Route path="/register" element={<RegisterPage />} />
       <Route path="/setup" element={<SetupPage />} />
       <Route
         path="/"
@@ -69,10 +82,8 @@ export default function App() {
         <Route path="master-data/items/:id/apu" element={<ApuEditorPage />} />
         <Route path="master-data/bcv-families" element={<FamiliesPage />} />
         <Route path="master-data/submaestros" element={<SubmaestrosPage />} />
-        <Route path="marketplace" element={<MarketplacePage />} />
         <Route path="marketplace/create" element={<ProductFormPage />} />
         <Route path="marketplace/rfq" element={<RfqPage />} />
-        <Route path="marketplace/contractors/:id" element={<MarketplacePage />} />
       </Route>
     </Routes>
   );
