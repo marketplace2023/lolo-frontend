@@ -10,12 +10,13 @@ interface IInsumoSelectorDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   tipo: "materiales" | "equipos" | "manoDeObra";
-  onSelect: (insumoId: string, tipo: string, cantidad: string) => void;
+  onSelect: (insumoId: string, tipo: string, cantidad: string, insumoData?: any) => void;
   isSubmitting: boolean;
 }
 
 export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSubmitting }: IInsumoSelectorDialogProps) {
   const [search, setSearch] = useState("");
+  const [page, setPage] = useState(1);
   const [selectedInsumo, setSelectedInsumo] = useState<any>(null);
   const [cantidad, setCantidad] = useState("");
 
@@ -34,8 +35,8 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
   const endpoint = endpointMap[tipo];
 
   const { data, isLoading } = useQuery({
-    queryKey: [endpoint, search],
-    queryFn: () => api.get(endpoint, { params: { search, limit: 10 } }).then((r) => r.data),
+    queryKey: [endpoint, search, page],
+    queryFn: () => api.get(endpoint, { params: { search, limit: 20, page } }).then((r) => r.data),
     enabled: open,
   });
 
@@ -43,13 +44,14 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
     setSelectedInsumo(null);
     setCantidad("");
     setSearch("");
+    setPage(1);
     onOpenChange(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (selectedInsumo && cantidad) {
-      onSelect(selectedInsumo.id, tipoBackendMap[tipo], cantidad);
+      onSelect(selectedInsumo.id, tipoBackendMap[tipo], cantidad, selectedInsumo);
       handleClose();
     }
   };
@@ -69,7 +71,7 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
               type="text" 
               placeholder="Buscar por código o descripción..."
               value={search}
-              onChange={(e) => setSearch(e.target.value)}
+              onChange={(e) => { setSearch(e.target.value); setPage(1); }}
               className="w-full pl-9 pr-4 py-2 rounded-lg bg-input border border-border focus:ring-2 focus:ring-ring focus:outline-none"
             />
           </div>
@@ -96,7 +98,9 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
                       <td className="px-3 py-2 font-mono text-xs text-muted-foreground">{item.codigo}</td>
                       <td className="px-3 py-2 max-w-[200px] truncate" title={item.descripcion}>{item.descripcion}</td>
                       <td className="px-3 py-2 text-xs">{item.unidad}</td>
-                      <td className="px-3 py-2 text-right font-mono">{formatCurrency(item.precio, "")}</td>
+                      <td className="px-3 py-2 text-right font-mono">
+                        {formatCurrency(item.precio ?? item.salarioBase ?? item.costoHorario, "")}
+                      </td>
                       <td className="px-3 py-2 text-right">
                         <Button size="sm" onClick={() => setSelectedInsumo(item)}>Seleccionar</Button>
                       </td>
@@ -106,6 +110,31 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
               </table>
             )}
           </div>
+          {data?.pagination && data.pagination.pages > 1 && !selectedInsumo && (
+            <div className="flex items-center justify-between px-2 pt-2 border-t border-border">
+              <p className="text-xs text-muted-foreground">
+                Página {data.pagination.page} de {data.pagination.pages}
+              </p>
+              <div className="flex gap-2">
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  disabled={page === 1} 
+                  onClick={() => setPage(p => Math.max(1, p - 1))}
+                >
+                  Anterior
+                </Button>
+                <Button 
+                  size="sm" 
+                  variant="secondary" 
+                  disabled={page === data.pagination.pages} 
+                  onClick={() => setPage(p => Math.min(data.pagination.pages, p + 1))}
+                >
+                  Siguiente
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       ) : (
         <form onSubmit={handleSubmit} className="space-y-6">
@@ -119,7 +148,7 @@ export function InsumoSelectorDialog({ open, onOpenChange, tipo, onSelect, isSub
             </div>
             <div className="flex gap-4 text-sm text-muted-foreground mt-4">
               <p>Unidad: <span className="font-medium text-foreground">{selectedInsumo.unidad}</span></p>
-              <p>Precio Ref: <span className="font-mono text-foreground">{formatCurrency(selectedInsumo.precio)}</span></p>
+              <p>Precio Ref: <span className="font-mono text-foreground">{formatCurrency(selectedInsumo.precio ?? selectedInsumo.salarioBase ?? selectedInsumo.costoHorario)}</span></p>
             </div>
           </div>
 

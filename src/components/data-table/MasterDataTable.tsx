@@ -30,6 +30,8 @@ interface IDataTableProps<T> {
   searchPlaceholder?: string;
   /** If false, hide create/edit/delete buttons. Default true. */
   editable?: boolean;
+  /** Optional override for create action instead of using the built-in modal */
+  onCreateClick?: () => void;
 }
 
 function FormBody({
@@ -84,7 +86,7 @@ function FormBody({
 }
 
 export function MasterDataTable<T extends Record<string, unknown>>({
-  title, queryKey, endpoint, columns, formFields = [], searchPlaceholder = "Buscar...", editable = true,
+  title, queryKey, endpoint, columns, formFields = [], searchPlaceholder = "Buscar...", editable = true, onCreateClick
 }: IDataTableProps<T>) {
   const queryClient = useQueryClient();
   const [page, setPage] = useState(1);
@@ -194,7 +196,7 @@ export function MasterDataTable<T extends Record<string, unknown>>({
             )}
           </form>
           {editable && formFields.length > 0 && (
-            <button onClick={openCreate}
+            <button onClick={onCreateClick || openCreate}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-primary text-primary-foreground text-sm hover:bg-primary/90 transition-colors">
               <Plus size={14} /> Nuevo
             </button>

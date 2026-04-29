@@ -21,6 +21,7 @@ import { MaterialsPage } from "@/features/master-data/MaterialsPage";
 import { EquipmentsPage } from "@/features/master-data/EquipmentsPage";
 import { LaborsPage } from "@/features/master-data/LaborsPage";
 import { ItemsPage } from "@/features/master-data/ItemsPage";
+import { NewItemPage } from "@/features/master-data/NewItemPage";
 import { ApuEditorPage } from "@/features/master-data/ApuEditorPage";
 import { FamiliesPage } from "@/features/master-data/FamiliesPage";
 import { SubmaestrosPage } from "@/features/master-data/SubmaestrosPage";
@@ -80,6 +81,7 @@ export default function App() {
         <Route path="master-data/equipments" element={<EquipmentsPage />} />
         <Route path="master-data/labor" element={<LaborsPage />} />
         <Route path="master-data/items" element={<ItemsPage />} />
+        <Route path="master-data/items/new" element={<NewItemPage />} />
         <Route path="master-data/items/:id/apu" element={<ApuEditorPage />} />
         <Route path="master-data/bcv-families" element={<FamiliesPage />} />
         <Route path="master-data/submaestros" element={<SubmaestrosPage />} />

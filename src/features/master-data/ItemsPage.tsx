@@ -12,6 +12,7 @@ export function ItemsPage() {
       queryKey="items"
       endpoint="/items"
       searchPlaceholder="Buscar partidas..."
+      onCreateClick={() => navigate("/master-data/items/new")}
       formFields={[
         { key: "codigo", label: "Código", required: true, placeholder: "EDF0001" },
         { key: "cobertura", label: "Código COVENIN", placeholder: "04-001-001" },
