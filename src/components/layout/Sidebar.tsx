@@ -1,8 +1,14 @@
 import { NavLink } from "react-router";
 import { cn } from "@/utils/cn";
 import {
-  LayoutDashboard, FolderOpen,
-  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag
+  LayoutDashboard,
+  FolderOpen,
+  Layers,
+  Building2,
+  ChevronDown,
+  HardHat,
+  Settings,
+  ShoppingBag,
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -17,10 +23,15 @@ interface INavItem {
 }
 
 const navItems: INavItem[] = [
-  { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard size={16} /> },
+  {
+    label: "Dashboard",
+    href: "/dashboard",
+    icon: <LayoutDashboard size={16} />,
+  },
   { label: "Proyectos", href: "/projects", icon: <FolderOpen size={16} /> },
   {
-    label: "Datos Maestros", icon: <Layers size={16} />,
+    label: "Datos Maestros",
+    icon: <Layers size={16} />,
     children: [
       { label: "Materiales", href: "/master-data/materials" },
       { label: "Equipos", href: "/master-data/equipments" },
@@ -32,12 +43,13 @@ const navItems: INavItem[] = [
   },
   { label: "Configuración", href: "/settings", icon: <Settings size={16} /> },
   {
-    label: "Marketplace", icon: <ShoppingBag size={16} />,
+    label: "Marketplace",
+    icon: <ShoppingBag size={16} />,
     children: [
-      { label: "Directorio de Empresas", href: "/directory" },
+      //{ label: "Directorio de Empresas", href: "/directory" },
       { label: "Publicar Producto/Servicio", href: "/marketplace/create" },
-      { label: "Solicitudes RFQ", href: "/marketplace/rfq" },
-      { label: "Mis Reseñas", href: "/marketplace/reviews" },
+      { label: "Solicitudes Cotizacion", href: "/marketplace/rfq" },
+      { label: "Reseñas", href: "/marketplace/reviews" },
     ],
   },
 ];
@@ -49,11 +61,13 @@ function NavGroup({ item }: { item: INavItem }) {
       <NavLink
         to={item.href!}
         className={({ isActive }) =>
-          cn("flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors",
+          cn(
+            "flex items-center gap-2.5 px-3 py-2 rounded-md text-sm transition-colors",
             isActive
               ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-              : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-          )}
+              : "text-sidebar-foreground hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+          )
+        }
       >
         {item.icon}
         {item.label}
@@ -66,8 +80,14 @@ function NavGroup({ item }: { item: INavItem }) {
         onClick={() => setOpen((o) => !o)}
         className="flex items-center justify-between w-full px-3 py-2 rounded-md text-sm text-sidebar-foreground hover:bg-sidebar-accent/50 transition-colors"
       >
-        <span className="flex items-center gap-2.5">{item.icon}{item.label}</span>
-        <ChevronDown size={14} className={cn("transition-transform", open && "rotate-180")} />
+        <span className="flex items-center gap-2.5">
+          {item.icon}
+          {item.label}
+        </span>
+        <ChevronDown
+          size={14}
+          className={cn("transition-transform", open && "rotate-180")}
+        />
       </button>
       {open && (
         <div className="ml-4 mt-0.5 border-l border-border pl-2 space-y-0.5">
@@ -76,11 +96,13 @@ function NavGroup({ item }: { item: INavItem }) {
               key={child.href}
               to={child.href}
               className={({ isActive }) =>
-                cn("block px-3 py-1.5 rounded-md text-xs transition-colors",
+                cn(
+                  "block px-3 py-1.5 rounded-md text-xs transition-colors",
                   isActive
                     ? "bg-sidebar-accent text-sidebar-accent-foreground font-medium"
-                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground"
-                )}
+                    : "text-sidebar-foreground/80 hover:bg-sidebar-accent/50 hover:text-sidebar-accent-foreground",
+                )
+              }
             >
               {child.label}
             </NavLink>
@@ -92,11 +114,11 @@ function NavGroup({ item }: { item: INavItem }) {
 }
 
 export function Sidebar() {
-  const user = useAuthStore(s => s.user);
-  
+  const user = useAuthStore((s) => s.user);
+
   const { data: company } = useQuery({
     queryKey: ["company", user?.companyId],
-    queryFn: () => api.get(`/companies/${user?.companyId}`).then(r => r.data),
+    queryFn: () => api.get(`/companies/${user?.companyId}`).then((r) => r.data),
     enabled: !!user?.companyId,
   });
 
@@ -124,7 +146,9 @@ export function Sidebar() {
       <div className="px-3 py-3 border-t border-border">
         <div className="flex items-center gap-2 text-xs text-muted-foreground">
           <Building2 size={12} className="shrink-0" />
-          <span className="truncate font-medium">{company?.nombre || "Sin empresa activa"}</span>
+          <span className="truncate font-medium">
+            {company?.nombre || "Sin empresa activa"}
+          </span>
         </div>
       </div>
     </aside>
