@@ -1,6 +1,10 @@
 import { useRef, useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
+
+interface IProductFormPageProps {
+  onSuccess?: () => void;
+}
 import {
   ArrowLeft,
   CheckCircle2,
@@ -23,7 +27,7 @@ const CATEGORY_OPTIONS = [
   { group: "Servicios", options: ["Subcontratos de Obra", "Ingenieria y Arquitectura"] },
 ];
 
-export function ProductFormPage() {
+export function ProductFormPage({ onSuccess }: IProductFormPageProps = {}) {
   const navigate = useNavigate();
   const queryClient = useQueryClient();
   const imageInputRef = useRef<HTMLInputElement | null>(null);
@@ -58,8 +62,11 @@ export function ProductFormPage() {
       queryClient.invalidateQueries({ queryKey: ["marketplace-offers"] });
       queryClient.invalidateQueries({ queryKey: ["marketplace-featured-offers"] });
       queryClient.invalidateQueries({ queryKey: ["marketplace-offers-my"] });
-      alert("Publicacion creada correctamente.");
-      navigate(`/product/${created.id}`);
+      if (onSuccess) {
+        onSuccess();
+      } else {
+        navigate(`/product/${created.id}`);
+      }
     },
     onError: () => {
       alert("No se pudo guardar la publicacion. Revisa los datos e intenta de nuevo.");
@@ -127,15 +134,17 @@ export function ProductFormPage() {
 
   return (
     <div className="max-w-4xl mx-auto space-y-6 pb-20 animate-in fade-in duration-500">
-      <div className="flex items-center gap-4 pb-4 border-b border-border">
-        <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted rounded-xl transition-colors">
-          <ArrowLeft size={20} className="text-muted-foreground hover:text-foreground transition-colors" />
-        </button>
-        <div>
-          <h2 className="text-2xl font-bold text-foreground tracking-tight">Nuevo Producto o Servicio</h2>
-          <p className="text-sm text-muted-foreground">Crea una publicacion real para el catalogo de tu empresa</p>
+      {!onSuccess && (
+        <div className="flex items-center gap-4 pb-4 border-b border-border">
+          <button onClick={() => navigate(-1)} className="p-2 hover:bg-muted rounded-xl transition-colors">
+            <ArrowLeft size={20} className="text-muted-foreground hover:text-foreground transition-colors" />
+          </button>
+          <div>
+            <h2 className="text-2xl font-bold text-foreground tracking-tight">Nuevo Producto o Servicio</h2>
+            <p className="text-sm text-muted-foreground">Crea una publicacion real para el catalogo de tu empresa</p>
+          </div>
         </div>
-      </div>
+      )}
 
       <div className="bg-card border border-border rounded-2xl p-6 shadow-sm mb-8">
         <div className="flex items-center justify-between relative">

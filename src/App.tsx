@@ -27,7 +27,7 @@ import { FamiliesPage } from "@/features/master-data/FamiliesPage";
 import { SubmaestrosPage } from "@/features/master-data/SubmaestrosPage";
 
 import { RfqPage } from "@/features/marketplace/RfqPage";
-import { ProductFormPage } from "@/features/marketplace/ProductFormPage";
+import { MyListingsPage } from "@/features/marketplace/MyListingsPage";
 import { ReviewsDashboardPage } from "@/features/dashboard/ReviewsDashboardPage";
 import { StorefrontPage } from "@/features/marketplace/StorefrontPage";
 import { DirectoryPage } from "@/features/marketplace/DirectoryPage";
@@ -87,7 +87,7 @@ export default function App() {
         <Route path="master-data/items/:id/apu" element={<ApuEditorPage />} />
         <Route path="master-data/bcv-families" element={<FamiliesPage />} />
         <Route path="master-data/submaestros" element={<SubmaestrosPage />} />
-        <Route path="marketplace/create" element={<ProductFormPage />} />
+        <Route path="marketplace/create" element={<MyListingsPage />} />
         <Route path="marketplace/rfq" element={<RfqPage />} />
         <Route path="marketplace/reviews" element={<ReviewsDashboardPage />} />
       </Route>
