@@ -31,6 +31,7 @@ import { ProductFormPage } from "@/features/marketplace/ProductFormPage";
 import { ReviewsDashboardPage } from "@/features/dashboard/ReviewsDashboardPage";
 import { StorefrontPage } from "@/features/marketplace/StorefrontPage";
 import { DirectoryPage } from "@/features/marketplace/DirectoryPage";
+import { ContractorProfilePage } from "@/features/marketplace/ContractorProfilePage";
 import { ShopPage } from "@/features/marketplace/ShopPage";
 import { ProductDetailPage } from "@/features/marketplace/ProductDetailPage";
 import { PublicLayout } from "@/features/marketplace/PublicLayout";
@@ -48,6 +49,7 @@ export default function App() {
         <Route path="/shop" element={<ShopPage />} />
         <Route path="/product/:id" element={<ProductDetailPage />} />
         <Route path="/directory" element={<DirectoryPage />} />
+        <Route path="/directory/:id" element={<ContractorProfilePage />} />
       </Route>
       <Route path="/login" element={<LoginPage />} />
       <Route path="/register" element={<RegisterPage />} />

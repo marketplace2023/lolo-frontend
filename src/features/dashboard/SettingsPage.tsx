@@ -1,13 +1,14 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { api } from "@/services/api";
 import { useAuthStore } from "@/store/useAuthStore";
 import { Button } from "@/components/ui/FormPrimitives";
+import { uploadImage } from "@/features/marketplace/api";
 import { 
-  Loader2, Store, Upload, MapPin, Building2, Phone, Mail, Award, 
-  Globe, BadgeCheck, Package, Clock, Link as LinkIcon, Instagram, 
-  Linkedin, Image as ImageIcon, Map, Trash2
+  Loader2, Store, Upload, MapPin, Building2, Phone, Mail,
+  Globe, BadgeCheck, Package, Clock, Link as LinkIcon, Instagram,
+  Linkedin, Image as ImageIcon, Map, Trash2, CheckCircle2, Plus
 } from "lucide-react";
 import { cn } from "@/utils/cn";
 
@@ -19,6 +20,9 @@ export function SettingsPage() {
 
   const [activeTab, setActiveTab] = useState("info");
   const [newSpecialty, setNewSpecialty] = useState("");
+  const logoInputRef = useRef<HTMLInputElement | null>(null);
+  const portadaInputRef = useRef<HTMLInputElement | null>(null);
+  const galleryInputRef = useRef<HTMLInputElement | null>(null);
 
   const [form, setForm] = useState({
     nombre: "",
@@ -26,6 +30,8 @@ export function SettingsPage() {
     direccion: "",
     telefono: "",
     email: "",
+    logo: "",
+    portada: "",
     sitioWeb: "",
     instagram: "",
     linkedin: "",
@@ -54,6 +60,8 @@ export function SettingsPage() {
         direccion: company.direccion || "",
         telefono: company.telefono || "",
         email: company.email || "",
+        logo: company.logo || "",
+        portada: company.portada || "",
         sitioWeb: company.sitioWeb || "",
         instagram: company.instagram || "",
         linkedin: company.linkedin || "",
@@ -81,6 +89,29 @@ export function SettingsPage() {
     }
   });
 
+  const uploadGalleryMutation = useMutation({
+    mutationFn: (file: File) => uploadImage(file),
+    onSuccess: (uploaded) => {
+      setForm((current) => ({ ...current, galeria: [...current.galeria, uploaded.url] }));
+    },
+    onError: () => {
+      alert("No se pudo subir la imagen.");
+    },
+  });
+
+  const uploadAssetMutation = useMutation({
+    mutationFn: async ({ file, field }: { file: File; field: "logo" | "portada" }) => {
+      const uploaded = await uploadImage(file);
+      return { field, url: uploaded.url };
+    },
+    onSuccess: ({ field, url }) => {
+      setForm((current) => ({ ...current, [field]: url }));
+    },
+    onError: () => {
+      alert("No se pudo subir la imagen.");
+    },
+  });
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!companyId) return;
@@ -100,8 +131,22 @@ export function SettingsPage() {
 
   const handleAddGalleryImage = () => {
     if (form.galeria.length < 6) {
-      setForm({ ...form, galeria: [...form.galeria, `https://picsum.photos/seed/${Math.random()}/600/400`] });
+      galleryInputRef.current?.click();
     }
+  };
+
+  const handleGalleryFileChange = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file || form.galeria.length >= 6) return;
+    uploadGalleryMutation.mutate(file);
+  };
+
+  const handleAssetFileChange = (field: "logo" | "portada") => (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    event.target.value = "";
+    if (!file) return;
+    uploadAssetMutation.mutate({ file, field });
   };
 
   const handleRemoveGalleryImage = (index: number) => {
@@ -123,6 +168,8 @@ export function SettingsPage() {
       </div>
     );
   }
+
+  const publicVisibilityChanged = Boolean(company) && form.isPublic !== Boolean(company?.isPublic);
 
   const tabs = [
     { id: 'info', label: 'Información', icon: Store },
@@ -153,7 +200,9 @@ export function SettingsPage() {
               <span className={cn("inline-block h-4 w-4 transform rounded-full bg-white transition-transform", form.isPublic ? 'translate-x-6' : 'translate-x-1')} />
             </button>
           </div>
-          {form.isPublic ? (
+          {publicVisibilityChanged ? (
+            <span className="text-xs text-amber-500 font-medium">Cambio pendiente de guardar</span>
+          ) : form.isPublic ? (
             <span className="text-xs text-emerald-500 font-medium">Visible en el directorio</span>
           ) : (
             <span className="text-xs text-muted-foreground font-medium">Perfil oculto</span>
@@ -165,21 +214,49 @@ export function SettingsPage() {
         
         {/* Banner y Logo */}
         <div className="bg-card border border-border rounded-xl overflow-hidden shadow-sm">
-          <div className="h-40 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent relative group">
-            <Button type="button" variant="secondary" size="sm" className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity">
+          <input
+            ref={portadaInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            className="hidden"
+            onChange={handleAssetFileChange("portada")}
+          />
+          <input
+            ref={logoInputRef}
+            type="file"
+            accept="image/png,image/jpeg,image/webp,image/gif"
+            className="hidden"
+            onChange={handleAssetFileChange("logo")}
+          />
+          <div
+            className="h-40 bg-gradient-to-r from-primary/30 via-primary/10 to-transparent relative group bg-cover bg-center"
+            style={form.portada ? { backgroundImage: `url(${form.portada})` } : undefined}
+          >
+            <Button
+              type="button"
+              variant="secondary"
+              size="sm"
+              loading={uploadAssetMutation.isPending}
+              onClick={() => portadaInputRef.current?.click()}
+              className="absolute bottom-4 right-4 bg-background/80 backdrop-blur-sm opacity-0 group-hover:opacity-100 transition-opacity"
+            >
               <Upload size={14} className="mr-2" /> Actualizar Portada
             </Button>
           </div>
           <div className="px-6 pb-6 pt-0 relative flex flex-col md:flex-row gap-6 items-end -mt-16">
             <div className="relative group">
               <div className="w-32 h-32 rounded-xl bg-card border-4 border-card flex items-center justify-center overflow-hidden shadow-lg">
-                {company?.logo ? (
-                  <img src={company.logo} alt="Logo" className="w-full h-full object-cover" />
+                {form.logo ? (
+                  <img src={form.logo} alt="Logo" className="w-full h-full object-cover" />
                 ) : (
                   <Building2 size={48} className="text-muted-foreground/50" />
                 )}
               </div>
-              <button type="button" className="absolute bottom-2 right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg hover:scale-105 transition opacity-0 group-hover:opacity-100">
+              <button
+                type="button"
+                onClick={() => logoInputRef.current?.click()}
+                className="absolute bottom-2 right-2 bg-primary text-primary-foreground p-2 rounded-full shadow-lg hover:scale-105 transition opacity-0 group-hover:opacity-100"
+              >
                 <Upload size={16} />
               </button>
             </div>
@@ -301,7 +378,9 @@ export function SettingsPage() {
                   <div>
                     <label className="block text-sm font-medium mb-1 flex items-center gap-1.5">
                       Número RNC
-                      <BadgeCheck size={14} className="text-blue-500" title="Registro Nacional de Contratistas" />
+                      <span title="Registro Nacional de Contratistas">
+                        <BadgeCheck size={14} className="text-blue-500" />
+                      </span>
                     </label>
                     <input
                       type="text"
@@ -448,6 +527,14 @@ export function SettingsPage() {
                   Sube fotos de tus obras completadas, equipo de trabajo, maquinaria o instalaciones. Una galería visual genera muchísima más confianza en los clientes (igual que en Google Business).
                 </p>
 
+                <input
+                  ref={galleryInputRef}
+                  type="file"
+                  accept="image/png,image/jpeg,image/webp,image/gif"
+                  className="hidden"
+                  onChange={handleGalleryFileChange}
+                />
+
                 <div className="grid grid-cols-2 md:grid-cols-3 gap-4 mt-6">
                   {form.galeria.map((img, i) => (
                     <div key={i} className="aspect-video rounded-xl border border-border relative group overflow-hidden bg-muted">
@@ -464,12 +551,13 @@ export function SettingsPage() {
                     <button 
                       type="button" 
                       onClick={handleAddGalleryImage}
+                      disabled={uploadGalleryMutation.isPending}
                       className="aspect-video rounded-xl border-2 border-dashed border-border flex flex-col items-center justify-center gap-2 text-muted-foreground hover:bg-muted hover:text-foreground transition-all hover:border-primary/50 group"
                     >
                       <div className="w-10 h-10 rounded-full bg-background border border-border flex items-center justify-center group-hover:scale-110 transition-transform shadow-sm">
-                        <Plus size={20} />
+                        {uploadGalleryMutation.isPending ? <Loader2 size={20} className="animate-spin" /> : <Plus size={20} />}
                       </div>
-                      <span className="text-xs font-medium">Añadir foto</span>
+                      <span className="text-xs font-medium">{uploadGalleryMutation.isPending ? "Subiendo..." : "Añadir foto"}</span>
                     </button>
                   )}
                 </div>
@@ -486,8 +574,8 @@ export function SettingsPage() {
               <h4 className="font-semibold text-foreground mb-1">Optimiza tu Perfil</h4>
               <div className="text-left text-xs space-y-2 mb-4 mt-4">
                 <div className="flex items-center gap-2">
-                  <CheckCircle2 size={14} className={form.descripcionPublica.length > 50 ? "text-emerald-500" : "text-muted-foreground/30"} />
-                  <span className={form.descripcionPublica.length > 50 ? "text-foreground" : "text-muted-foreground"}>Descripción agregada</span>
+                  <CheckCircle2 size={14} className={form.descripcionPublica.trim().length > 0 ? "text-emerald-500" : "text-muted-foreground/30"} />
+                  <span className={form.descripcionPublica.trim().length > 0 ? "text-foreground" : "text-muted-foreground"}>Descripción agregada</span>
                 </div>
                 <div className="flex items-center gap-2">
                   <CheckCircle2 size={14} className={form.galeria.length > 0 ? "text-emerald-500" : "text-muted-foreground/30"} />
@@ -517,7 +605,7 @@ export function SettingsPage() {
               </p>
               <Button 
                 type="button" 
-                variant="outline" 
+                variant="secondary"
                 className="w-full border-primary/30 hover:bg-primary hover:text-white transition-all"
                 onClick={() => navigate('/marketplace/create')}
               >
@@ -529,8 +617,4 @@ export function SettingsPage() {
       </form>
     </div>
   );
-}
-// Placeholder components since lucide-react import was altered above
-function CheckCircle2(props: any) {
-  return <svg {...props} xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"/><path d="m9 12 2 2 4-4"/></svg>
 }

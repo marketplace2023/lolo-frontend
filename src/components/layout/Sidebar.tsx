@@ -1,8 +1,8 @@
 import { NavLink } from "react-router";
 import { cn } from "@/utils/cn";
 import {
-  LayoutDashboard, FolderOpen, Package, Wrench, Users2,
-  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag, MessageSquare
+  LayoutDashboard, FolderOpen,
+  Layers, Building2, ChevronDown, HardHat, Settings, ShoppingBag
 } from "lucide-react";
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
@@ -34,7 +34,7 @@ const navItems: INavItem[] = [
   {
     label: "Marketplace", icon: <ShoppingBag size={16} />,
     children: [
-      { label: "Directorio de Empresas", href: "/marketplace/directory" },
+      { label: "Directorio de Empresas", href: "/directory" },
       { label: "Publicar Producto/Servicio", href: "/marketplace/create" },
       { label: "Solicitudes RFQ", href: "/marketplace/rfq" },
       { label: "Mis Reseñas", href: "/marketplace/reviews" },
